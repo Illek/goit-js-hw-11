@@ -2,7 +2,7 @@ import iziToast from 'izitoast';
 import 'izitoast/dist/css/iziToast.min.css';
 import createMarkup from './render-functions';
 
-const API_KEY = '43558017-e13ccc47d2aef7f917b5afe22';
+const API_KEY = '44303353-9b630a8fdc8cdbe3ae770ff69';
 const BASE_URL = 'https://pixabay.com/api/';
 const loader = document.querySelector('.loader');
 const listOfImages = document.querySelector('#images');
