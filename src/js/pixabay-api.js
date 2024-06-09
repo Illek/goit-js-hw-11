@@ -65,7 +65,6 @@ function showNoResultsMessage() {
     message:
       'Sorry, there are no images matching your search query. Please, try again!',
     position: 'topRight',
-    iconUrl: icon,
     backgroundColor: '#EF4040',
     transitionIn: 'bounceInDown',
     transitionOut: 'fadeOutUp',
