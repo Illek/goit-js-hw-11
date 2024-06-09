@@ -1,46 +1,79 @@
 import iziToast from 'izitoast';
 import 'izitoast/dist/css/iziToast.min.css';
-export function showError(message) {
-  iziToast.error({
-    icon: '',
-    backgroundColor: '#ef4040',
-    position: 'topRight',
-    message: 'Oh, shit! Type something',
-    messageColor: 'white',
-  });
-}
-export function fetchImages(query) {
-  const BASE_URL = 'https://pixabay.com/api/';
+import createMarkup from './render-functions';
 
-  const params = new URLSearchParams({
-    key: '44041025-2e091a4b621ea033778029d2c',
-    q: query,
+const API_KEY = '43558017-e13ccc47d2aef7f917b5afe22';
+const BASE_URL = 'https://pixabay.com/api/';
+const loader = document.querySelector('.loader');
+const listOfImages = document.querySelector('#images');
+
+export default function fetchImages(searchValue) {
+  resetImageList();
+  showLoader();
+
+  const url = constructURL(searchValue);
+
+  fetch(url)
+    .then(handleResponse)
+    .then(data => handleData(data))
+    .catch(handleError)
+    .finally(hideLoader);
+}
+
+function resetImageList() {
+  listOfImages.innerHTML = '';
+}
+
+function showLoader() {
+  loader.style.display = 'block';
+}
+
+function hideLoader() {
+  loader.style.display = 'none';
+}
+
+function constructURL(searchValue) {
+  const searchParams = new URLSearchParams({
+    key: API_KEY,
+    q: searchValue,
     image_type: 'photo',
     orientation: 'horizontal',
     safesearch: true,
   });
 
-  const url = `${BASE_URL}?${params}`;
-  return fetch(url)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error(response.statusText);
-      }
-      return response.json();
-    })
-    .then(data => {
-      if (data.hits.length === 0) {
-        iziToast.error({
-          icon: '',
-          backgroundColor: '#ef4040',
-          position: 'topRight',
-          message:
-            '&#11198; Sorry, there are no images matching your search query. Please, try again!',
-          messageColor: 'white',
-        });
-      } else {
-        return data.hits;
-      }
-    })
-    .catch(error => console.log(error));
+  return `${BASE_URL}?${searchParams}`;
+}
+
+function handleResponse(response) {
+  if (!response.ok) {
+    throw new Error(response.status);
+  }
+  return response.json();
+}
+
+function handleData(data) {
+  if (data.total === 0) {
+    showNoResultsMessage();
+    return;
+  }
+  createMarkup(data);
+}
+
+function showNoResultsMessage() {
+  iziToast.show({
+    class: 'search-404',
+    message:
+      'Sorry, there are no images matching your search query. Please, try again!',
+    position: 'topRight',
+    iconUrl: icon,
+    backgroundColor: '#EF4040',
+    transitionIn: 'bounceInDown',
+    transitionOut: 'fadeOutUp',
+    theme: 'dark',
+    closeOnClick: true,
+  });
+}
+
+function handleError(error) {
+  console.error('Fetch error:', error.message);
 }
